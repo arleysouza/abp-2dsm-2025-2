@@ -1,0 +1,73 @@
+services:
+  postgres-furnas-campanha:
+    image: postgres:17-alpine
+    container_name: postgres-furnas-campanha
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bdfurnas-campanha
+    ports:
+      - "5433:5432"
+    volumes:
+      # Persistência dos dados
+      - furnas_data:/var/lib/postgresql/data
+      # Scripts de inicialização
+      - ./furnas-campanha/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
+      - ./furnas-campanha/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
+      - ./furnas-campanha/csv:/csv
+    networks:
+      - abp-network
+
+  postgres-sima:
+    image: postgres:17-alpine
+    container_name: postgres-sima
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bdsima
+    ports:
+      - "5434:5432"
+    volumes:
+      # Persistência dos dados
+      - sima_data:/var/lib/postgresql/data
+      # Scripts de inicialização
+      - ./sima/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
+      - ./sima/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
+      - ./sima/csv:/csv
+    networks:
+      - abp-network
+
+  server-app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server-app
+    restart: always
+    networks:
+      - abp-network
+    depends_on:
+      - postgres-furnas-campanha
+    environment:
+      # Variáveis de conexão com o banco
+      DB_HOST: postgres-furnas-campanha
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: bdfurnas-campanha
+      HOST_PORT: 3001
+    volumes:
+      # Bind mount para edição em tempo real
+      - ./server:/usr/src/app
+    command: npm run dev
+    ports:
+      - "3001:3000"
+
+volumes:
+  furnas_data:
+  sima_data:
+
+networks:
+  abp-network:
+    driver: bridge
