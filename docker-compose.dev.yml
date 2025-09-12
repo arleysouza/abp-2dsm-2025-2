@@ -11,7 +11,7 @@ services:
       - "5433:5432"
     volumes:
       # Persistência dos dados
-      - furnas_data:/var/lib/postgresql/data
+      - furnas_campanha_data:/var/lib/postgresql/data
       # Scripts de inicialização
       - ./furnas-campanha/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
       - ./furnas-campanha/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
@@ -36,6 +36,26 @@ services:
       - ./sima/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
       - ./sima/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
       - ./sima/csv:/csv
+    networks:
+      - abp-network
+
+  postgres-balcar-campanha:
+    image: postgres:17-alpine
+    container_name: postgres-balcar-campanha
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bdbalcar-campanha
+    ports:
+      - "5435:5432"
+    volumes:
+      # Persistência dos dados
+      - balcar_campanha_data:/var/lib/postgresql/data
+      # Scripts de inicialização
+      - ./balcar-campanha/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
+      - ./balcar-campanha/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
+      - ./balcar-campanha/csv:/csv
     networks:
       - abp-network
 
@@ -65,8 +85,9 @@ services:
       - "3001:3000"
 
 volumes:
-  furnas_data:
+  furnas_campanha_data:
   sima_data:
+  balcar_campanha_data:
 
 networks:
   abp-network:

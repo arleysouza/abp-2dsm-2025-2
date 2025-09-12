@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS
 tbcampotabela,
 tbsensor,
 tbsima,
+tbsimaoffline,
 tbestacao
 CASCADE;
 
@@ -24,6 +25,17 @@ CREATE TABLE tbestacao (
   inicio DATE NULL,
   fim DATE NULL,
   PRIMARY KEY(idestacao)
+);
+
+CREATE TABLE tbcampotabela (
+  idcampotabela INTEGER NOT NULL,
+  idSensor INTEGER NULL,
+  nomecampo VARCHAR(30) NULL,
+  rotulo VARCHAR(32) NULL,
+  unidademedida VARCHAR(8) NULL,
+  ordem INTEGER NULL,
+  PRIMARY KEY(idcampotabela),
+  CONSTRAINT tbcampotabela_sensorfk FOREIGN KEY (idSensor) REFERENCES tbsensor (idSensor) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE tbsima (
@@ -63,15 +75,41 @@ CREATE TABLE tbsima (
   co2_low FLOAT NULL,
   co2_high FLOAT NULL,
   precipitacao FLOAT NULL,
-  PRIMARY KEY(idsima)
+  PRIMARY KEY(idsima),
+  CONSTRAINT tbsima_estacaofk FOREIGN KEY (idestacao) REFERENCES tbestacao (idestacao) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE tbcampotabela (
-  idcampotabela INTEGER NOT NULL,
-  idSensor INTEGER NULL,
-  nomecampo VARCHAR(30) NULL,
-  rotulo VARCHAR(32) NULL,
-  unidademedida VARCHAR(8) NULL,
-  ordem INTEGER NULL,
-  PRIMARY KEY(idcampotabela)
+CREATE TABLE tbsimaoffline (
+  idsimaoffline SERIAL NOT NULL,
+  idestacao CHAR(6) NOT NULL,
+  datahora TIMESTAMP NULL,
+  dirvt NUMERIC(5,2) NULL,
+  intensvt NUMERIC(5,2) NULL,
+  u_vel NUMERIC(4,2) NULL,
+  v_vel NUMERIC(4,2) NULL,
+  tempag1 NUMERIC(4,2) NULL,
+  tempag2 NUMERIC(4,2) NULL,
+  tempag3 NUMERIC(4,2) NULL,
+  tempag4 NUMERIC(4,2) NULL,
+  tempar NUMERIC(4,2) NULL,
+  ur NUMERIC(5,2) NULL,
+  tempar_r NUMERIC(5,2) NULL,
+  pressatm NUMERIC(6,2) NULL,
+  radincid NUMERIC(6,2) NULL,
+  radrefl NUMERIC(6,2) NULL,
+  fonteradiometro NUMERIC(4,2) NULL,
+  sonda_temp NUMERIC(4,2) NULL,
+  sonda_cond NUMERIC(4,2) NULL,
+  sonda_do NUMERIC(4,2) NULL,
+  sonda_ph NUMERIC(4,2) NULL,
+  sonda_nh4 NUMERIC(6,3) NULL,
+  sonda_no3 NUMERIC(6,3) NULL,
+  sonda_turb NUMERIC(6,2) NULL,
+  sonda_chl NUMERIC(6,2) NULL,
+  sonda_bateria NUMERIC(4,2) NULL,
+  corr_norte NUMERIC(5,2) NULL,
+  corr_leste NUMERIC(5,2) NULL,
+  bateriapainel NUMERIC(4,2) NULL,
+  PRIMARY KEY(idsimaoffline),
+  CONSTRAINT tbsimaoffline_estacaofk FOREIGN KEY (idestacao) REFERENCES tbestacao (idestacao) ON DELETE CASCADE ON UPDATE CASCADE
 );

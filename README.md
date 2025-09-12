@@ -19,6 +19,12 @@ A organização do projeto segue uma separação clara entre bancos de dados (sc
 
 ```bash
 app/
+├── balcar-campanha/
+│   ├── csv/                       # Arquivos de dados (CSV) carregados nas tabelas
+│   ├── copy-table.sql             # Script SQL para importar os arquivos CSV para o banco
+│   ├── create-table.sql           # Script SQL para criar a estrutura das tabelas
+│   └── balcar-campanha-modelo.xml # Modelo conceitual do banco, visualizável no DBDesigner
+│  
 ├── furnas-campanha/
 │   ├── csv/                       # Arquivos de dados (CSV) carregados nas tabelas
 │   ├── copy-table.sql             # Script SQL para importar os arquivos CSV para o banco
