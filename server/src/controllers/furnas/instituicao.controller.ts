@@ -20,13 +20,11 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       ORDER BY nome
       LIMIT $1 OFFSET $2
       `,
-      [limit, offset]
+      [limit, offset],
     );
 
     // consulta total de registros
-    const countResult = await furnasPool.query(
-      "SELECT COUNT(*) FROM tbinstituicao"
-    );
+    const countResult = await furnasPool.query("SELECT COUNT(*) FROM tbinstituicao");
     const total = Number(countResult.rows[0].count);
 
     res.status(200).json({

@@ -36,4 +36,3 @@ app.use(errorHandler);
 app.listen(PORT, function () {
   console.log(`Servidor rodando em http://localhost:${process.env.HOST_PORT}`);
 });
-

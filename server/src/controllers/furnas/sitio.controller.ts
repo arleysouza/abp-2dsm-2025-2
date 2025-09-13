@@ -29,7 +29,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       ORDER BY a.nome
       LIMIT $1 OFFSET $2
       `,
-      [limit, offset]
+      [limit, offset],
     );
 
     // consulta total de registros
@@ -66,8 +66,6 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       message: error.message,
       stack: error.stack,
     });
-    res
-      .status(500)
-      .json({ success: false, error: "Erro ao realizar a operação." });
+    res.status(500).json({ success: false, error: "Erro ao realizar a operação." });
   }
 };

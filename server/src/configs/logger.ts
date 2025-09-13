@@ -13,7 +13,7 @@ export const logger = winston.createLogger({
   level: logLevel,
   format: combine(
     timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    errors({ stack: true }) // captura stack trace em erros
+    errors({ stack: true }), // captura stack trace em erros
   ),
   transports: [
     new winston.transports.Console({

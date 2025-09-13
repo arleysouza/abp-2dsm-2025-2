@@ -1,12 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { logger } from "../configs/logger";
 
-export function errorHandler(
-  err: any,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) {
+export function errorHandler(err: any, req: Request, res: Response, _next: NextFunction) {
   logger.error("Unhandled error", {
     message: err.message,
     stack: err.stack,
