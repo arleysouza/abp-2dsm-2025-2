@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import router from "./routes";
+import { errorHandler } from "./middlewares/errorHandler";
 
 // Carrega as variáveis de ambiente definidas no arquivo .env
 dotenv.config();
@@ -28,7 +29,11 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
+// middleware de erro sempre por último
+app.use(errorHandler);
+
 // Inicializa o servidor na porta definida
 app.listen(PORT, function () {
   console.log(`Servidor rodando em http://localhost:${process.env.HOST_PORT}`);
 });
+

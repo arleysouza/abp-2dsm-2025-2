@@ -73,3 +73,21 @@ As pastas `furnas-campanha/` e `sima/` contêm tudo o que é necessário para cr
 É aqui que entram os conceitos de APIs, camadas de software (rotas, controllers, configs), e boas práticas de desenvolvimento (ESLint, Prettier, variáveis de ambiente).
 
 Os arquivos da raiz (`.gitignore`, `docker-compose.dev.yml` etc.) servem para configuração global do projeto.
+
+---
+
+### Banco de dados em containers separados
+
+ Em cenários de desenvolvimento e até em alguns de produção, manter cada banco de dados em seu próprio container é uma boa prática porque:
+- Isolamento: cada banco tem seu próprio ciclo de vida, backup e restore.
+- Reprodutibilidade: você consegue subir/derrubar apenas o banco necessário sem afetar os outros.
+- Escalabilidade: se um banco crescer demais ou precisar de configuração específica (parâmetros do Postgres, volume dedicado etc.), não impacta os demais.
+- Menos acoplamento: facilita dividir responsabilidades entre times ou serviços diferentes.
+
+⚠️ Contudo, em produção, muitas vezes se opta por um único cluster PostgreSQL com vários bancos ou esquemas, para simplificar administração e reduzir sobrecarga de containers.
+
+
+### Integração Contínua no GitHub Actions
+
+Job node-ci → validação de código (formatação, lint, build).
+Job docker-ci → build e subida da stack Docker.

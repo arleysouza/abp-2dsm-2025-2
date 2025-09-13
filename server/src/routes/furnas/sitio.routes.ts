@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAll } from "../controllers/reservatorio.controller";
+import { getAll } from "../../controllers/furnas/sitio.controller";
 
 const router = Router();
 

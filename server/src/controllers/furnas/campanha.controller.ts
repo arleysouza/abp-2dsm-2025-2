@@ -1,9 +1,18 @@
 import { Request, Response } from "express";
-import db from "../configs/db";
+import { furnasPool } from "../../configs/db";
+import { logger } from "../../configs/logger";
 
-export const getAll = async (_req: Request, res: Response): Promise<void> => {
+const PAGE_SIZE = Number(process.env.PAGE_SIZE) || 10;
+
+export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const result = await db.query(`
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || PAGE_SIZE;
+    const offset = (page - 1) * limit;
+
+    // consulta com paginação
+    const result = await furnasPool.query(
+      `
       SELECT 
         a.idcampanha,
         a.nrocampanha,
@@ -21,8 +30,18 @@ export const getAll = async (_req: Request, res: Response): Promise<void> => {
       LEFT JOIN tbreservatorio AS c 
         ON a.idreservatorio = c.idreservatorio
       ORDER BY c.nome, a.nrocampanha
-    `);
+      LIMIT $1 OFFSET $2
+      `,
+      [limit, offset]
+    );
 
+    // consulta total de registros
+    const countResult = await furnasPool.query(
+      "SELECT COUNT(*) FROM tbcampanha"
+    );
+    const total = Number(countResult.rows[0].count);
+
+    // dados formatados
     const data = result.rows.map((row: any) => ({
       idcampanha: row.idcampanha,
       instituicao: row.idinstituicao
@@ -44,9 +63,23 @@ export const getAll = async (_req: Request, res: Response): Promise<void> => {
       datafim: row.datafim,
     }));
 
-    res.status(200).json({ success: true, data });
+    res.status(200).json({
+      success: true,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      data,
+    });
   } catch (error: any) {
-    console.error(error.message);
-    res.status(500).json({ success: false, error: "Erro ao realizar a operação." });
+    logger.error("Erro ao consultar tbcampanha", {
+      message: error.message,
+      stack: error.stack,
+    });
+
+    res.status(500).json({
+      success: false,
+      error: "Erro ao realizar a operação.",
+    });
   }
 };

@@ -10,9 +10,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      # Persistência dos dados
       - furnas_campanha_data:/var/lib/postgresql/data
-      # Scripts de inicialização
       - ./furnas-campanha/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
       - ./furnas-campanha/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
       - ./furnas-campanha/csv:/csv
@@ -30,9 +28,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      # Persistência dos dados
       - sima_data:/var/lib/postgresql/data
-      # Scripts de inicialização
       - ./sima/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
       - ./sima/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
       - ./sima/csv:/csv
@@ -50,9 +46,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      # Persistência dos dados
       - balcar_campanha_data:/var/lib/postgresql/data
-      # Scripts de inicialização
       - ./balcar-campanha/create-table.sql:/docker-entrypoint-initdb.d/1-create-table.sql
       - ./balcar-campanha/copy-table.sql:/docker-entrypoint-initdb.d/2-copy-table.sql
       - ./balcar-campanha/csv:/csv
@@ -69,17 +63,35 @@ services:
       - abp-network
     depends_on:
       - postgres-furnas-campanha
+      - postgres-sima
+      - postgres-balcar-campanha
     environment:
-      # Variáveis de conexão com o banco
-      DB_HOST: postgres-furnas-campanha
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: bdfurnas-campanha
+      PORT: 3000
       HOST_PORT: 3001
+
+      DB_FURNAS_HOST: postgres-furnas-campanha
+      DB_FURNAS_PORT: 5432
+      DB_FURNAS_USER: postgres
+      DB_FURNAS_PASSWORD: postgres
+      DB_FURNAS_NAME: bdfurnas-campanha
+
+      DB_SIMA_HOST: postgres-sima
+      DB_SIMA_PORT: 5432
+      DB_SIMA_USER: postgres
+      DB_SIMA_PASSWORD: postgres
+      DB_SIMA_NAME: bdsima
+
+      DB_BALCAR_HOST: postgres-balcar-campanha
+      DB_BALCAR_PORT: 5432
+      DB_BALCAR_USER: postgres
+      DB_BALCAR_PASSWORD: postgres
+      DB_BALCAR_NAME: bdbalcar-campanha
+
+      PAGE_SIZE: 20
+      LOG_LEVEL: debug
     volumes:
-      # Bind mount para edição em tempo real
       - ./server:/usr/src/app
+      - ./logs:/usr/src/app/logs
     command: npm run dev
     ports:
       - "3001:3000"
