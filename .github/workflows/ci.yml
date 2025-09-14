@@ -7,8 +7,8 @@ on:
     branches: ["main"]
 
 jobs:
-  node-ci:
-    name: Node.js CI
+  server-ci:
+    name: Server CI
     runs-on: ubuntu-latest
 
     steps:
@@ -43,6 +43,47 @@ jobs:
       - name: Run TypeScript build
         run: npm run build
         working-directory: ./server
+
+  front-ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: ./front/package-lock.json
+
+      # 3. Instalar dependências
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./front
+
+      # 4. Checar formatação (Prettier)
+      - name: Run Prettier check
+        run: npm run format:check
+        working-directory: ./front
+
+      # 5. Lint (ESLint + Stylelint)
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: ./front
+
+      - name: Run Stylelint
+        run: npm run lint:css
+        working-directory: ./front
+
+      # 6. Build (Vite + TypeScript)
+      - name: Run Build
+        run: npm run build
+        working-directory: ./front
 
   docker-ci:
     name: Docker Compose CI
