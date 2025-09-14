@@ -48,13 +48,11 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       ORDER BY datahora DESC
       LIMIT $1 OFFSET $2
       `,
-      [limit, offset]
+      [limit, offset],
     );
 
     // total de registros
-    const countResult = await simaPool.query(
-      "SELECT COUNT(*) FROM tbsimaoffline"
-    );
+    const countResult = await simaPool.query("SELECT COUNT(*) FROM tbsimaoffline");
     const total = Number(countResult.rows[0].count);
 
     res.status(200).json({
