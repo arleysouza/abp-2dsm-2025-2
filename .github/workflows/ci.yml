@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
+          cache-dependency-path: ./server/package-lock.json
 
       # 3. Instalar dependências
       - name: Install dependencies
