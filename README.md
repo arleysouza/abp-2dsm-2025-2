@@ -2,7 +2,7 @@
 
 Para inicializar todo o ambiente (bancos de dados e aplicação), utilize o comando abaixo:
 ```bash
-docker compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml up --build -d
 ```
 
 - A flag `--build` garante que a imagem do servidor seja recompilada, aplicando quaisquer alterações recentes no código-fonte.

@@ -63,26 +63,6 @@ CREATE TABLE tbcampanha (
       ON UPDATE NO ACTION
 );
 
-
-CREATE TABLE tbcampanhatemp (
-  idcampanha INTEGER ,
-  idreservatorio INTEGER NOT NULL,
-  idinstituicao INTEGER NOT NULL,
-  nrocampanha INTEGER NULL,
-  rotulo VARCHAR(100) NULL,
-  datainicio DATE NULL,
-  datafim DATE NULL,
-  PRIMARY KEY(idcampanha),
-  FOREIGN KEY(idinstituicao)
-    REFERENCES tbinstituicao(idinstituicao)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION,
-  FOREIGN KEY(idreservatorio)
-    REFERENCES tbreservatorio(idreservatorio)
-      ON DELETE NO ACTION
-      ON UPDATE NO ACTION
-);
-
 CREATE TABLE tbfluxoinpe (
   idfluxoinpe INTEGER ,
   idsitio INTEGER NOT NULL,

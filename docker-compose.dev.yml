@@ -89,12 +89,33 @@ services:
 
       PAGE_SIZE: 20
       LOG_LEVEL: debug
+      CORS_ORIGIN: http://localhost:3002
     volumes:
       - ./server:/usr/src/app
       - ./logs:/usr/src/app/logs
     command: npm run dev
     ports:
       - "3001:3000"
+
+  front-app:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: front-app
+    restart: always
+    networks:
+      - abp-network
+    depends_on:
+      - server-app
+    environment:
+      VITE_SERVER_PORT: 3001
+      CHOKIDAR_USEPOLLING: "true"   # garante hot reload dentro do container
+    volumes:
+      - ./front:/usr/src/app        # código local
+      - /usr/src/app/node_modules   # mantém dependências no container
+    command: npm run dev -- --host
+    ports:
+      - "3002:5173"
 
 volumes:
   furnas_campanha_data:
