@@ -1,15 +1,21 @@
+## 📊 Projeto ABP – Repositório de Dados Limnológicos
+
+Este projeto integra múltiplos bancos de dados PostgreSQL, uma API em Node.js/Express escrita em TypeScript, e um front-end em React (Vite + TypeScript + styled-components).
+O objetivo é oferecer uma aplicação organizada, containerizada e com boas práticas de desenvolvimento (linting, formatação, CI/CD e tema global).
+
+
 ### ▶️ Subindo os Containers
 
-Para inicializar todo o ambiente (bancos de dados e aplicação), utilize o comando abaixo:
+Para inicializar todo o ambiente (bancos de dados, servidor e front-end):
 ```bash
 docker compose -f docker-compose.dev.yml up --build -d
 ```
-
-- A flag `--build` garante que a imagem do servidor seja recompilada, aplicando quaisquer alterações recentes no código-fonte.
-
+- A flag `--build` força a reconstrução das imagens (aplica alterações recentes).
 - Certifique-se de executar o comando na raiz do projeto, ou seja, no diretório onde está localizado o arquivo `docker-compose.dev.yml`. Caso contrário, o Docker não encontrará as definições dos serviços.
-
-💡 Dica: Para encerrar os containers, utilize `Ctrl + C` no terminal e, em seguida, `docker compose -f docker-compose.dev.yml down` para liberar os recursos e remover a rede criada automaticamente.
+- Para parar os containers:
+```bash
+docker compose -f docker-compose.dev.yml down
+```
 
 ---
 
@@ -19,7 +25,7 @@ A organização do projeto segue uma separação clara entre bancos de dados (sc
 
 ```bash
 app/
-├── balcar-campanha/
+├── balcar-campanha/            
 │   ├── csv/                       # Arquivos de dados (CSV) carregados nas tabelas
 │   ├── copy-table.sql             # Script SQL para importar os arquivos CSV para o banco
 │   ├── create-table.sql           # Script SQL para criar a estrutura das tabelas
@@ -54,40 +60,97 @@ app/
 │   ├── .prettierrc                # Configuração de formatação automática (Prettier)
 │   └── .prettierignore            # Arquivos/pastas ignorados pelo Prettier
 │
+├── front/                        # Front-end React + Vite + styled-components
+│   ├── src/
+│   │   ├── api/                  # Consumo da API (axios)
+│   │   ├── components/           # Componentes reutilizáveis
+│   │   ├── hooks/                
+│   │   ├── pages/                # Páginas (ex.: SimaPage)
+│   │   ├── styles/               # GlobalStyle + ThemeProvider
+│   │   └── types/               
+│   ├── Dockerfile
+│   ├── vite.config.ts
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── .github/workflows/ci.yml       # Pipeline de Integração Contínua
 ├── .gitignore                     # Define arquivos e pastas que não devem ir para o Git
 └── docker-compose.dev.yml         # Definições dos serviços Docker para ambiente de desenvolvimento
   
 ```
 
-### 🔑 Explicação Geral
+---
 
-As pastas `furnas-campanha/` e `sima/` contêm tudo o que é necessário para criar e popular cada banco de dados:
+### 🔑 Principais Tecnologias e Configurações
 
-- Estrutura (tabelas)
+**Back-end (`server/`)**
 
-    - Dados (arquivos CSV)
-    - Modelo conceitual (XML, para documentação e análise em ferramentas gráficas).
-    - A pasta `server/` concentra o código da aplicação Node.js/TypeScript que consome os bancos.
-    - O servidor é containerizado via Dockerfile e configurado pelo `docker-compose.dev.yml`.
+- Node.js + Express + TypeScript.
+- Estrutura em camadas (configs, controllers, routes).
+- Conexão com múltiplos bancos via `pg.Pool`.
+- Middlewares: JSON parser, erro global, CORS configurado (apenas GET).
+- ESLint + Prettier para padronização de código.
+- Dockerfile com hot reload (ts-node-dev).
 
-É aqui que entram os conceitos de APIs, camadas de software (rotas, controllers, configs), e boas práticas de desenvolvimento (ESLint, Prettier, variáveis de ambiente).
+**Front-end (`front/`)**
 
-Os arquivos da raiz (`.gitignore`, `docker-compose.dev.yml` etc.) servem para configuração global do projeto.
+- React + Vite + TypeScript.
+- styled-components com `ThemeProvider` global (cores, tipografia, espaçamento).
+- GlobalStyle para reset de estilos.
+- Barra Brasil + Menu responsivo com hambúrguer.
+- Estrutura organizada (`api/`, `components/`, `pages/`, `styles/`).
+* Axios configurado com `VITE_SERVER_PORT`.
+
+**Banco de Dados**
+
+- PostgreSQL 17 (um container por domínio: furnas-campanha, sima, balcar-campanha).
+- Scripts SQL para `CREATE TABLE` e `COPY FROM CSV`.
+- Volumes persistentes para dados.
+- Cada banco acessível em uma porta distinta (5433, 5434, 5435).
+
+**CI/CD**
+
+- GitHub Actions (`.github/workflows/ci.yml`):
+    - O projeto utiliza GitHub Actions para garantir qualidade de código e que a stack Docker esteja sempre saudável.
+    - O pipeline roda automaticamente em **push** e **pull requests** para a branch `main`.
+- Estrutura de Jobs: `server-ci`, `front-ci` e `docker-ci`.
 
 ---
 
-### Banco de dados em containers separados
+### B🚀 Como rodar o projeto localmente (sem Docker)
 
- Em cenários de desenvolvimento e até em alguns de produção, manter cada banco de dados em seu próprio container é uma boa prática porque:
-- Isolamento: cada banco tem seu próprio ciclo de vida, backup e restore.
-- Reprodutibilidade: você consegue subir/derrubar apenas o banco necessário sem afetar os outros.
-- Escalabilidade: se um banco crescer demais ou precisar de configuração específica (parâmetros do Postgres, volume dedicado etc.), não impacta os demais.
-- Menos acoplamento: facilita dividir responsabilidades entre times ou serviços diferentes.
+**Back-end**
+```bash
+cd server
+npm install
+npm run dev
+```
+API disponível em: http://localhost:3001
 
-⚠️ Contudo, em produção, muitas vezes se opta por um único cluster PostgreSQL com vários bancos ou esquemas, para simplificar administração e reduzir sobrecarga de containers.
+**Front-end**
+```bash
+cd front
+npm install
+npm run dev
+```
+App disponível em: http://localhost:3002
 
 
-### Integração Contínua no GitHub Actions
+--- 
 
-Job node-ci → validação de código (formatação, lint, build).
-Job docker-ci → build e subida da stack Docker.
+### 🌐 Acessando a Aplicação
+
+- Front-end (React): http://localhost:3002
+
+- Back-end (API Node): http://localhost:3001
+    - Exemplo: http://localhost:3001/sima/sima/all?page=1&limit=20
+
+---
+
+### 🛠️ Boas práticas aplicadas
+
+- Separação clara de camadas (DB / API / Front).
+- Containers independentes para cada banco.
+- Hot reload para server e front em dev.
+- ESLint + Prettier + Stylelint (garantindo padronização de código e CSS).
+- CI no GitHub Actions.

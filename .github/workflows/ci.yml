@@ -16,13 +16,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
+      # 2. Setup Node.js (cache compartilhado com front)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: ./server/package-lock.json
+          cache-dependency-path: |
+            ./server/package-lock.json
+            ./front/package-lock.json
 
       # 3. Instalar dependências
       - name: Install dependencies
@@ -53,13 +55,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
+      # 2. Setup Node.js (cache compartilhado com server)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: ./front/package-lock.json
+          cache-dependency-path: |
+            ./server/package-lock.json
+            ./front/package-lock.json
 
       # 3. Instalar dependências
       - name: Install dependencies
@@ -88,6 +92,7 @@ jobs:
   docker-ci:
     name: Docker Compose CI
     runs-on: ubuntu-latest
+    needs: [server-ci, front-ci] # só roda se os dois jobs passarem
 
     steps:
       # 1. Checkout
