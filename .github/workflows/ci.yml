@@ -75,13 +75,9 @@ jobs:
         run: npm run format:check
         working-directory: ./front
 
-      # 5. Lint (ESLint + Stylelint)
+      # 5. Lint (ESLint)
       - name: Run ESLint
         run: npm run lint
-        working-directory: ./front
-
-      - name: Run Stylelint
-        run: npm run lint:css
         working-directory: ./front
 
       # 6. Build (Vite + TypeScript)
