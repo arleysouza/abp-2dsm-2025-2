@@ -20,6 +20,7 @@ export interface Sima {
   radincid?: number;
   radrefl?: number;
   bateria?: number;
+  precipitacao?: number;
 }
 
 export interface PaginatedResponse<T> {

@@ -152,5 +152,5 @@ App disponível em: http://localhost:3002
 - Separação clara de camadas (DB / API / Front).
 - Containers independentes para cada banco.
 - Hot reload para server e front em dev.
-- ESLint + Prettier + Stylelint (garantindo padronização de código e CSS).
+- ESLint + Prettier (garantindo padronização de código).
 - CI no GitHub Actions.
