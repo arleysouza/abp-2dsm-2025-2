@@ -424,8 +424,8 @@ erDiagram
     }
 
     TBESTACAO {
-        char idestacao PK
-        char idhexadecimal
+        varchar idestacao PK
+        varchar idhexadecimal
         varchar rotulo
         float lat
         float lng
@@ -444,7 +444,7 @@ erDiagram
 
     TBSIMA {
         int idsima PK
-        char idestacao FK
+        varchar idestacao FK
         timestamp datahora
         int regno
         int nofsamples
@@ -483,7 +483,7 @@ erDiagram
 
     TBSIMAOFFLINE {
         int idsimaoffline PK
-        char idestacao FK
+        varchar idestacao FK
         timestamp datahora
         numeric dirvt
         numeric intensvt
