@@ -154,3 +154,86 @@ App disponível em: http://localhost:3002
 - Hot reload para server e front em dev.
 - ESLint + Prettier (garantindo padronização de código).
 - CI no GitHub Actions.
+
+---
+
+### Modelos de dados
+
+**Banco de dados `balcar-campanha`**
+```mermaid
+erDiagram
+    TBRESERVATORIO {
+        int idreservatorio PK
+        varchar nome
+        float lat
+        float lng
+    }
+
+    TBTABELACAMPO {
+        int idtabelacampo PK
+        varchar nome
+        varchar rotulo
+        varchar unidade
+        varchar descricao
+        int ordem
+    }
+
+    TBINSTITUICAO {
+        int idinstituicao PK
+        varchar nome
+    }
+
+    TBSITIO {
+        int idsitio PK
+        int idreservatorio FK
+        varchar nome
+        float lat
+        float lng
+        varchar descricao
+    }
+
+    TBCAMPANHA {
+        int idcampanha PK
+        int idreservatorio FK
+        int idinstituicao FK
+        int nrocampanha
+        date datainicio
+        date datafim
+    }
+
+    TBFLUXOINPE {
+        int idfluxoinpe PK
+        int idsitio FK
+        int idcampanha FK
+        date datamedida
+        numeric ch4
+        numeric batimetria
+        numeric tempar
+        numeric tempcupula
+        numeric tempaguasubsuperficie
+        numeric tempaguameio
+        numeric tempaguafundo
+        numeric phsubsuperficie
+        numeric phmeio
+        numeric phfundo
+        numeric orpsubsuperficie
+        numeric orpmeio
+        numeric orpfundo
+        numeric condutividadesubsuperficie
+        numeric condutividademeio
+        numeric condutividadefundo
+        numeric odsubsuperficie
+        numeric odmeio
+        numeric odfundo
+        numeric tsdsubsuperficie
+        numeric tsdmeio
+        numeric tsdfundo
+    }
+
+    %% Relacionamentos
+    TBSITIO }o--|| TBRESERVATORIO : "pertence a"
+    TBCAMPANHA }o--|| TBRESERVATORIO : "referencia"
+    TBCAMPANHA }o--|| TBINSTITUICAO : "realizada por"
+    TBFLUXOINPE }o--|| TBSITIO : "coletado em"
+    TBFLUXOINPE }o--|| TBCAMPANHA : "faz parte de"
+```
