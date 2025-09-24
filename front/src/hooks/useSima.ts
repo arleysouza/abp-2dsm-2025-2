@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { getSima } from "../api/simaApi";
 import type { PaginatedResponse, Sima } from "../types/sima";
 
-export const useSima = (page: number = 1, limit: number = 20, idestacao = "32445") => {
+export const useSima = (
+  page: number = 1,
+  limit: number = 20,
+  idestacao = "32445",
+  inicio = "2000-01-01",
+  fim = "2020-01-01",
+) => {
   const [data, setData] = useState<PaginatedResponse<Sima> | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    getSima(page, limit, idestacao)
+    getSima(page, limit, idestacao, inicio, fim)
       .then((res) => {
         setData(res);
         setError(null);
@@ -18,7 +24,7 @@ export const useSima = (page: number = 1, limit: number = 20, idestacao = "32445
         setError(err.message || "Erro ao buscar dados de Sima");
       })
       .finally(() => setLoading(false));
-  }, [page, limit, idestacao]);
+  }, [page, limit, idestacao, inicio, fim]);
 
   return { data, loading, error };
 };

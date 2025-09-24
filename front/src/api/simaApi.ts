@@ -9,9 +9,11 @@ export const getSima = async (
   page: number = 1,
   limit: number = 20,
   idestacao: string = "32445",
+  inicio: string,
+  fim: string,
 ): Promise<PaginatedResponse<Sima>> => {
   const response = await axios.get<PaginatedResponse<Sima>>(
-    `${VITE_SERVER}/sima/sima/porestacao?page=${page}&limit=${limit}&idestacao=${idestacao}`,
+    `${VITE_SERVER}/sima/sima/porestacao?page=${page}&limit=${limit}&idestacao=${idestacao}&inicio=${inicio}&fim=${fim}`,
   );
   return response.data;
 };

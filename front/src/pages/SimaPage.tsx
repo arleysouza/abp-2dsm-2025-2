@@ -142,7 +142,7 @@ function SimaPage() {
   const [dataFim, setDataFim] = useState<string>("");
 
   const { data: estacoes, loading: loadingEstacoes, error: erroEstacoes } = useEstacao();
-  const { data, loading, error } = useSima(page, 10, idestacao || "32445");
+  const { data, loading, error } = useSima(page, 10, idestacao || "32445", dataInicio, dataFim);
 
   // encontra a estação selecionada
   const estacaoSelecionada = estacoes.find((e) => e.idestacao === (idestacao || "32445"));
@@ -168,8 +168,6 @@ function SimaPage() {
               onChange={(e) => {
                 setIdestacao(e.target.value);
                 setPage(1);
-                setDataInicio("");
-                setDataFim("");
               }}
             >
               <option value="">Selecione a estação</option>

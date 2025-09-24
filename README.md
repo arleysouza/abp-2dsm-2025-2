@@ -6,7 +6,23 @@ O objetivo é oferecer uma aplicação organizada, containerizada e com boas pr�
 
 ### ▶️ Subindo os Containers
 
-Para inicializar todo o ambiente (bancos de dados, servidor e front-end):
+1. Clonar o repositório e instalar dependências:
+```bash
+git clone https://github.com/arleysouza/abp-2dsm-2025-2.git app
+cd app
+```
+
+2. Como o projeto roda com bind mount no container, então será necessário instalar as dependências nas pasta `/front` e `/server`:
+```bash
+cd server
+npm i
+cd ..
+cd front
+npm i
+```
+Certifique-se de que exista a pasta `node_modules` nas pastas `front` e `/server`.
+
+3. Para inicializar todo o ambiente (bancos de dados, servidor e front-end):
 ```bash
 docker compose -f docker-compose.dev.yml up --build -d
 ```

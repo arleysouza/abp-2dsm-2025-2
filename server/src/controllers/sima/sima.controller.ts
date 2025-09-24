@@ -118,6 +118,8 @@ export const getEstacoes = async (req: Request, res: Response): Promise<void> =>
 export const getByEstacao = async (req: Request, res: Response): Promise<void> => {
   try {
     const idestacao = Number(req.query.idestacao) || "32445";
+    const inicio = req.query.inicio || "2000-01-01";
+    const fim = req.query.fim || "2020-01-01";
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || PAGE_SIZE;
     const offset = (page - 1) * limit;
@@ -163,17 +165,18 @@ export const getByEstacao = async (req: Request, res: Response): Promise<void> =
         co2_high,
         precipitacao
       FROM tbsima
-      WHERE idestacao = $1
+      WHERE idestacao = $1 AND datahora >= $2 AND datahora <= $3
       ORDER BY datahora DESC
-      LIMIT $2 OFFSET $3
+      LIMIT $4 OFFSET $5
       `,
-      [idestacao, limit, offset],
+      [idestacao, inicio, fim, limit, offset],
     );
 
     // total de registros
-    const countResult = await simaPool.query("SELECT COUNT(*) FROM tbsima WHERE idestacao = $1", [
-      idestacao,
-    ]);
+    const countResult = await simaPool.query(
+      "SELECT COUNT(*) FROM tbsima WHERE idestacao = $1 AND datahora >= $2 AND datahora <= $3",
+      [idestacao, inicio, fim],
+    );
     const total = Number(countResult.rows[0].count);
 
     res.status(200).json({
@@ -181,6 +184,8 @@ export const getByEstacao = async (req: Request, res: Response): Promise<void> =
       page,
       limit,
       total,
+      inicio,
+      fim,
       totalPages: Math.ceil(total / limit),
       data: result.rows,
     });
