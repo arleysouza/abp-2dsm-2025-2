@@ -141,14 +141,20 @@ function SimaPage() {
       fim: dataFim,
     });
     setPage(newPage);
+
+    // 🔹 atualiza título após a requisição concluir
+    const est = estacoes.find((e) => e.idestacao === idestacao);
+    if (est) {
+      setTituloEstacao(` - ${est.rotulo}`);
+    }
   };
 
-  // dispara a requisição inicial
+  // 🔹 busca inicial ao montar a página
   useEffect(() => {
     handleFetch(1);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // executa só uma vez
 
-  // atualiza título só depois que a requisição retorna (quando `data` muda)
   useEffect(() => {
     if (data && estacoes.length > 0) {
       const est = estacoes.find((e) => e.idestacao === idestacao);
@@ -156,7 +162,7 @@ function SimaPage() {
         setTituloEstacao(` - ${est.rotulo}`);
       }
     }
-    // 🔹 removido `idestacao` daqui para não disparar ao trocar o select
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, estacoes]);
 
   return (

@@ -22,17 +22,21 @@ export const useSima = () => {
           params.limit,
           params.idestacao,
           params.inicio,
-          params.fim
+          params.fim,
         );
         setData(res);
         setError(null);
-      } catch (err: any) {
-        setError(err.message || "Erro ao buscar dados de Sima");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Erro ao buscar dados de Sima");
+        }
       } finally {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   return { data, loading, error, fetchData };
