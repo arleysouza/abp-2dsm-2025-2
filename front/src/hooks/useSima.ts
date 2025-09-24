@@ -1,30 +1,39 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { getSima } from "../api/simaApi";
 import type { PaginatedResponse, Sima } from "../types/sima";
 
-export const useSima = (
-  page: number = 1,
-  limit: number = 20,
-  idestacao = "32445",
-  inicio = "2000-01-01",
-  fim = "2020-01-01",
-) => {
+export const useSima = () => {
   const [data, setData] = useState<PaginatedResponse<Sima> | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
-    getSima(page, limit, idestacao, inicio, fim)
-      .then((res) => {
+  const fetchData = useCallback(
+    async (params: {
+      page: number;
+      limit: number;
+      idestacao: string;
+      inicio: string;
+      fim: string;
+    }) => {
+      setLoading(true);
+      try {
+        const res = await getSima(
+          params.page,
+          params.limit,
+          params.idestacao,
+          params.inicio,
+          params.fim
+        );
         setData(res);
         setError(null);
-      })
-      .catch((err) => {
+      } catch (err: any) {
         setError(err.message || "Erro ao buscar dados de Sima");
-      })
-      .finally(() => setLoading(false));
-  }, [page, limit, idestacao, inicio, fim]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  return { data, loading, error };
+  return { data, loading, error, fetchData };
 };

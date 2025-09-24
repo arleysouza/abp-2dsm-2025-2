@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useSima } from "../hooks/useSima"; // hook de dados SIMA
-import { useEstacao } from "../hooks/useEstacao"; // hook de estações
+import { useSima } from "../hooks/useSima";
+import { useEstacao } from "../hooks/useEstacao";
 
 // Container principal da página
 const PageContainer = styled.div`
@@ -75,7 +75,7 @@ const Button = styled.button<{ disabled?: boolean }>`
   }
 `;
 
-// Filtros (container do select e datas)
+// Filtros
 const FilterContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -88,7 +88,6 @@ const FilterContainer = styled.div`
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 `;
 
-// Select estilizado
 const Select = styled.select`
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -97,23 +96,8 @@ const Select = styled.select`
   color: #111827;
   font-size: 1rem;
   cursor: pointer;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-
-  &:hover {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: #1d4ed8;
-    box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.3);
-  }
 `;
 
-// Campo de data estilizado
 const DateInput = styled.input`
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -131,33 +115,56 @@ const formatDateTime = (isoString: string) => {
   const yy = String(date.getFullYear()).slice(-2);
   const hh = String(date.getHours()).padStart(2, "0");
   const min = String(date.getMinutes()).padStart(2, "0");
-
   return `${dd}/${mm}/${yy} ${hh}:${min}`;
 };
 
 function SimaPage() {
   const [page, setPage] = useState(1);
-  const [idestacao, setIdestacao] = useState<string>("");
-  const [dataInicio, setDataInicio] = useState<string>("");
-  const [dataFim, setDataFim] = useState<string>("");
+  const [idestacao, setIdestacao] = useState<string>("32445"); // inicia com 32445
+  const [dataInicio, setDataInicio] = useState<string>("2000-01-01");
+  const [dataFim, setDataFim] = useState<string>("2020-01-01");
+  const [tituloEstacao, setTituloEstacao] = useState<string>(""); // 🔹 título controlado
 
   const { data: estacoes, loading: loadingEstacoes, error: erroEstacoes } = useEstacao();
-  const { data, loading, error } = useSima(page, 10, idestacao || "32445", dataInicio, dataFim);
+  const { data, loading, error, fetchData } = useSima();
 
-  // encontra a estação selecionada
-  const estacaoSelecionada = estacoes.find((e) => e.idestacao === (idestacao || "32445"));
-  const tituloEstacao = estacaoSelecionada ? ` - ${estacaoSelecionada.rotulo}` : "";
-
-  // define os limites de data
+  const estacaoSelecionada = estacoes.find((e) => e.idestacao === idestacao);
   const minDate = estacaoSelecionada?.inicio ? estacaoSelecionada.inicio.split("T")[0] : "";
   const maxDate = estacaoSelecionada?.fim ? estacaoSelecionada.fim.split("T")[0] : "";
+
+  const handleFetch = async (newPage = page) => {
+    await fetchData({
+      page: newPage,
+      limit: 10,
+      idestacao,
+      inicio: dataInicio,
+      fim: dataFim,
+    });
+    setPage(newPage);
+  };
+
+  // dispara a requisição inicial
+  useEffect(() => {
+    handleFetch(1);
+  }, []);
+
+  // atualiza título só depois que a requisição retorna (quando `data` muda)
+  useEffect(() => {
+    if (data && estacoes.length > 0) {
+      const est = estacoes.find((e) => e.idestacao === idestacao);
+      if (est) {
+        setTituloEstacao(` - ${est.rotulo}`);
+      }
+    }
+    // 🔹 removido `idestacao` daqui para não disparar ao trocar o select
+  }, [data, estacoes]);
 
   return (
     <PageContainer>
       <Title>SIMA{tituloEstacao}</Title>
 
       <FilterContainer>
-        {/* Seleção de estação */}
+        {/* Select de estação */}
         {loadingEstacoes && <p>Carregando estações...</p>}
         {erroEstacoes && <p style={{ color: "red" }}>{erroEstacoes}</p>}
         {!loadingEstacoes && estacoes.length > 0 && (
@@ -168,9 +175,9 @@ function SimaPage() {
               onChange={(e) => {
                 setIdestacao(e.target.value);
                 setPage(1);
+                // não muda o título aqui, só na requisição
               }}
             >
-              <option value="">Selecione a estação</option>
               {estacoes.map((est) => (
                 <option key={est.idestacao} value={est.idestacao}>
                   {est.rotulo}
@@ -180,7 +187,7 @@ function SimaPage() {
           </label>
         )}
 
-        {/* Seleção de intervalo de datas */}
+        {/* Intervalo de datas */}
         {estacaoSelecionada && (
           <>
             <label>
@@ -205,6 +212,9 @@ function SimaPage() {
             </label>
           </>
         )}
+
+        {/* Botão de busca */}
+        <Button onClick={() => handleFetch(1)}>Obter</Button>
       </FilterContainer>
 
       {loading && <p>Carregando registros...</p>}
@@ -266,13 +276,13 @@ function SimaPage() {
           </Table>
 
           <Pagination>
-            <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
+            <Button disabled={page === 1} onClick={() => handleFetch(page - 1)}>
               Anterior
             </Button>
             <span>
               Página {page} de {data.totalPages}
             </span>
-            <Button disabled={page === data.totalPages} onClick={() => setPage(page + 1)}>
+            <Button disabled={page === data.totalPages} onClick={() => handleFetch(page + 1)}>
               Próxima
             </Button>
           </Pagination>
