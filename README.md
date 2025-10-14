@@ -173,6 +173,58 @@ App disponível em: http://localhost:3002
 
 ---
 
+
+### 🛠️ Configurar o pgAdmin
+
+Acesse no navegador http://localhost:5050 e forneça os seguintes dados de login:  
+e-mail: *admin@example.com*  
+senha: *admin*
+
+Observações:
+- As credenciais acima vêm do serviço `pgadmin` no `docker-compose.dev.yml`.
+- O pgAdmin roda no mesmo cluster Docker; por isso, use os nomes dos serviços como host e a porta interna `5432`.
+- Se usar um pgAdmin fora do Docker, conecte em `localhost` usando as portas externas: `5433` (furnas-campanha), `5434` (sima), `5435` (balcar-campanha).
+- Se você trocou o `PGADMIN_DEFAULT_EMAIL` e o login não atualiza, remova o volume `pgadmin_data` e recrie o container.
+
+**Conectar ao banco balcar-campanha**
+Acesse **Servers > Register > Server...**  
+Na aba `General` forneça:  
+- Name: *balcar-campanha*  
+Na aba `Connection` forneça:
+- Host name/address: *postgres-balcar-campanha*
+- Port: *5432*
+- Maintenance database: *bdbalcar-campanha*
+- Username: *postgres*
+- Password: *postgres*
+- Save Password: *true*
+
+**Conectar ao banco furnas-campanha**
+Acesse **Servers > Register > Server...**  
+Na aba `General` forneça:  
+- Name: *furnas-campanha*  
+Na aba `Connection` forneça:
+- Host name/address: *postgres-furnas-campanha*
+- Port: *5432*
+- Maintenance database: *bdfurnas-campanha*
+- Username: *postgres*
+- Password: *postgres*
+- Save Password: *true*
+
+**Conectar ao banco sima**
+Acesse **Servers > Register > Server...**  
+Na aba `General` forneça:  
+- Name: *sima*  
+Na aba `Connection` forneça:
+- Host name/address: *postgres-sima*
+- Port: *5432*
+- Maintenance database: *bdsima*
+- Username: *postgres*
+- Password: *postgres*
+- Save Password: *true*
+
+
+---
+
 ### Bancos de dados
 
 **Banco de dados `balcar-campanha`**
